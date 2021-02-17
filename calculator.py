@@ -1,14 +1,14 @@
 from operator import add, sub, mul, truediv
 
 
-def verify_input(s):
+def verify_input(s: str) -> None:
     if not s:
         raise ValueError('Empty formula')
     elif not isinstance(s, str):
         raise ValueError('s needs to be a string')
 
 
-def prefix_calc(s):
+def prefix_calc(s: str) -> float:
     verify_input(s)
     opdict = {'+': add, '-': sub, '*': mul, '/': truediv}
     stack = []
@@ -42,7 +42,7 @@ def prefix_calc(s):
         return float(stack.pop())
 
 
-def infix_to_prefix(s):
+def infix_to_prefix(s: str) -> str:
     stack = []
     prefix_s = ''
     last_seen_digit = False
