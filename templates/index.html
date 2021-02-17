@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ current_type }} Calculator</title>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+
+<div class="content">
+    <h1>{{ current_type }} Calculator</h1>
+
+    <form action="/{{ current_type.lower() }}/submit" method="post">
+        <input type="text" id="finput" name="finput"><br><br>
+        <input type="submit" value="Submit">
+        <a href="{{ url_for(other_type.lower()) }}">
+            <button type="button">Switch to {{ other_type }}</button>
+        </a>
+    </form>
+
+    <div {% if error %} class="error" {% else %} class="result" {% endif %}>
+        {{ result }}
+    </div>
+</div>
+
+</body>
+</html>
