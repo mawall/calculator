@@ -3,16 +3,22 @@ from operator import add, sub, mul, truediv
 
 def verify_input(s: str) -> None:
     if not s:
-        raise ValueError('Empty formula')
+        raise ValueError('Empty expression')
     elif not isinstance(s, str):
         raise ValueError('s needs to be a string')
 
 
 def prefix_calc(s: str) -> float:
+    """ Prefix Calculator Stack Implementation
+    Time: O(N)
+    Space: O(1) best case  - operators frequently encountered
+           O(N) worst case - operators all at beginning of expression
+    """
     verify_input(s)
     opdict = {'+': add, '-': sub, '*': mul, '/': truediv}
     stack = []
     last_seen_digit = False
+
     for token in s[::-1]:
         if token.isdigit():
             if last_seen_digit:
@@ -43,6 +49,10 @@ def prefix_calc(s: str) -> float:
 
 
 def infix_to_prefix(s: str) -> str:
+    """ Infix to Prefix Conversion
+    Time: O(N)
+    Space: O(N)
+    """
     stack = []
     prefix_s = ''
     last_seen_digit = False
@@ -80,6 +90,10 @@ def infix_to_prefix(s: str) -> str:
 
 
 def infix_calc(s: str) -> float:
+    """ Infix Calculator Stack Implementation
+    Time: O(N)
+    Space: O(N)
+    """
     verify_input(s)
     prefix_s = infix_to_prefix(s)
 
