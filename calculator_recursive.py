@@ -108,9 +108,6 @@ def infix_recursion(tokens: list, opdict: dict) -> float:
 def infix_calc(s: str) -> float:
     """ Infix Calculator Recursive Implementation
     Time: O(N)
-          O(N^2) worst case - for expressions that look like the below and cause the
-                              recursion function to call itself twice:
-                              ( ( ( ... ) + ( ... ) ) + ( ( ... ) + ( ... ) ) )
     Space: O(N) - potentially O(1)
 
     Similar to prefix_calc above, I assume this could be implemented in O(1) space
