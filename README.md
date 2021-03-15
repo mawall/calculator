@@ -1,3 +1,11 @@
+Simple calculator for expressions in prefix (polish) and fully parenthesized infix notation
+
+* Assumes space separated tokens as input
+* Supports addition, subtraction, multiplication and division
+* Does not handle divisions by zero
+* Includes minimal REST interface
+
+
 #### Dependencies
 * Python 3.8
 * Flask
