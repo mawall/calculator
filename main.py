@@ -1,5 +1,5 @@
-from calculator import prefix_calc
-from calculator import infix_calc
+from calculator import calculate_prefix
+from calculator import calculate_infix
 
 from flask import Flask, request, render_template
 
@@ -34,13 +34,13 @@ def calculate(func, current_type, other_type):
 
 
 @app.route("/prefix/submit", methods=['POST'])
-def calculate_prefix():
-    return calculate(prefix_calc, current_type='Prefix', other_type='Infix')
+def submit_prefix_calculation():
+    return calculate(calculate_prefix, current_type='Prefix', other_type='Infix')
 
 
 @app.route("/infix/submit", methods=['POST'])
-def calculate_infix():
-    return calculate(infix_calc, current_type='Infix', other_type='Prefix')
+def submit_infix_calculation():
+    return calculate(calculate_infix, current_type='Infix', other_type='Prefix')
 
 
 if __name__ == '__main__':

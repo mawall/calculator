@@ -1,5 +1,7 @@
 from operator import add, sub, mul, truediv
 
+opdict = {'+': add, '-': sub, '*': mul, '/': truediv}
+
 
 def verify_input(s: str) -> None:
     if not s:
@@ -8,14 +10,37 @@ def verify_input(s: str) -> None:
         raise ValueError('s needs to be a string')
 
 
-def prefix_calc(s: str) -> float:
-    """ Prefix Calculator Stack Implementation
-    Time: O(N)
-    Space: O(1) best case  - operators frequently encountered
-           O(N) worst case - operators all at beginning of expression
+def pop_operand_from_stack(stack: list) -> float:
+    try:
+        operand = float(stack.pop())
+    except IndexError as e:
+        raise ValueError(f'Malformatted input') from e
+
+    return operand
+
+
+def apply_operator_to_one_operand_on_stack(operator: str,
+                                           operand_1: float,
+                                           stack: list) -> None:
+    operand_2 = pop_operand_from_stack(stack)
+    try:
+        stack.append(str(opdict[operator](operand_1, operand_2)))
+    except KeyError as e:
+        raise ValueError(f'Unknown operator: {operator}') from e
+
+
+def apply_operator_to_two_operands_on_stack(operator: str, stack: list) -> None:
+    operand_1 = pop_operand_from_stack(stack)
+    apply_operator_to_one_operand_on_stack(operator, operand_1, stack)
+
+
+def calculate_prefix(s: str) -> float:
+    """ Prefix Calculator: Shunting-yard Implementation
+    Time Complexity: O(N)
+    Space Complexity: O(1) expected case - operators frequently encountered
+                      O(N) worst case - operators all at beginning of expression
     """
     verify_input(s)
-    opdict = {'+': add, '-': sub, '*': mul, '/': truediv}
     stack = []
     last_seen_digit = False
 
@@ -28,16 +53,7 @@ def prefix_calc(s: str) -> float:
                 stack.append(token)
             last_seen_digit = True
         elif not token.isspace():
-            try:
-                token_1 = float(stack.pop())
-                token_2 = float(stack.pop())
-            except IndexError as e:
-                raise ValueError(f'Malformatted input') from e
-
-            try:
-                stack.append(str(opdict[token](token_1, token_2)))
-            except KeyError as e:
-                raise ValueError(f'Unknown operator: {token}') from e
+            apply_operator_to_two_operands_on_stack(token, stack)
             last_seen_digit = False
         else:
             last_seen_digit = False
@@ -48,53 +64,49 @@ def prefix_calc(s: str) -> float:
         return float(stack.pop())
 
 
-def infix_to_prefix(s: str) -> str:
-    """ Infix to Prefix Conversion
-    Time: O(N)
-    Space: O(N)
+def calculate_infix(s: str) -> float:
+    """Infix Calculator: Shunting-yard Implementation
+    Time Complexity: O(N)
+    Space Complexity: O(1) expected case
+                      O(N) worst case - deeply nested brackets
     """
-    stack = []
-    prefix_s = ''
+    verify_input(s)
+    operator_stack = []
+    result_stack = []
     last_seen_digit = False
 
     for token in s[::-1]:
-        if token in ['+', '-', '*', '/']:
-            while stack and stack[-1] != ')':
-                prefix_s += ' ' + stack.pop()
-            stack.append(token)
-            last_seen_digit = False
-        elif token == ')':  # opening bracket
-            stack.append(token)
-            last_seen_digit = False
-        elif token == '(':  # closing bracket
-            try:
-                while stack[-1] != ')':
-                    prefix_s += ' ' + stack.pop()
-            except IndexError as e:
-                raise ValueError(f'Malformatted input') from e
-            stack.pop()
-            last_seen_digit = False
-        elif token.isdigit():
-            if last_seen_digit:
-                prefix_s += token
+        if token.isdigit():
+            if operator_stack and operator_stack[-1] in opdict:
+                operator = operator_stack.pop()
+                apply_operator_to_one_operand_on_stack(operator,
+                                                       float(token),
+                                                       result_stack)
+            elif last_seen_digit:
+                last_token = result_stack.pop()
+                result_stack.append(token + last_token)
             else:
-                prefix_s += ' ' + token
+                result_stack.append(token)
             last_seen_digit = True
+        elif token == '(':
+            if operator_stack and operator_stack[-1] == ')':
+                operator_stack.pop()
+            elif len(operator_stack) >= 2 \
+                    and operator_stack[-1] in opdict \
+                    and operator_stack[-2] == ')':
+                operator = operator_stack.pop()
+                apply_operator_to_two_operands_on_stack(operator, result_stack)
+                operator_stack.pop()
+            else:
+                raise ValueError(f'Malformatted input')
+            last_seen_digit = False
+        elif not token.isspace():
+            operator_stack.append(token)
+            last_seen_digit = False
         else:
             last_seen_digit = False
 
-    while stack:
-        prefix_s += ' ' + stack.pop()
-
-    return prefix_s[1:][::-1]
-
-
-def infix_calc(s: str) -> float:
-    """ Infix Calculator Stack Implementation
-    Time: O(N)
-    Space: O(N)
-    """
-    verify_input(s)
-    prefix_s = infix_to_prefix(s)
-
-    return prefix_calc(prefix_s)
+    if operator_stack or len(result_stack) > 1:
+        raise ValueError(f'Malformatted input')
+    else:
+        return float(result_stack.pop())
